@@ -1,0 +1,47 @@
+{
+  "id": "./",
+  "name": "코드핏 - C# 문제 풀이",
+  "short_name": "코드핏",
+  "description": "객관식, 주관식, 빈칸, 코딩 문제를 유형별 또는 랜덤으로 연습하는 C# 학습 앱",
+  "lang": "ko-KR",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f4f6fa",
+  "theme_color": "#151c2c",
+  "categories": ["education", "productivity"],
+  "icons": [
+    {
+      "src": "icons/app-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/app-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/app-icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "랜덤 믹스 시작",
+      "short_name": "랜덤 믹스",
+      "url": "./?mode=mix",
+      "icons": [
+        {
+          "src": "icons/app-icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}
