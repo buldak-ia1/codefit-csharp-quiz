@@ -28,6 +28,7 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  overflow-x: hidden;
   background:
     radial-gradient(circle at 10% -10%, rgba(71, 115, 232, 0.14), transparent 32%),
     var(--bg);
@@ -47,9 +48,11 @@ button {
 }
 
 .app-shell {
-  width: min(100%, 760px);
+  width: 100%;
+  max-width: 760px;
   min-height: 100vh;
   margin: 0 auto;
+  overflow-x: hidden;
   background: rgba(244, 246, 250, 0.82);
 }
 
@@ -149,7 +152,74 @@ button {
 }
 
 main {
+  width: 100%;
+  min-width: 0;
   padding: 20px 18px max(36px, env(safe-area-inset-bottom));
+}
+
+.subject-switch {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+  margin-bottom: 18px;
+}
+
+.subject-button {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 9px;
+  padding: 11px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+  cursor: pointer;
+  text-align: left;
+}
+
+.subject-button.active {
+  border-color: var(--subject-color);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--subject-color) 18%, transparent);
+}
+
+.subject-button strong,
+.subject-button small {
+  display: block;
+}
+
+.subject-button strong {
+  overflow: hidden;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.subject-button small {
+  margin-top: 3px;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 8px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.subject-symbol {
+  display: grid;
+  flex: 0 0 35px;
+  height: 35px;
+  place-items: center;
+  border-radius: 11px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.subject-symbol.csharp {
+  background: var(--navy);
+}
+
+.subject-symbol.android {
+  background: #3da55d;
 }
 
 .hero {
@@ -439,10 +509,12 @@ main {
 
 .quiz-screen {
   min-height: calc(100vh - 114px);
+  min-width: 0;
 }
 
 .quiz-meta {
   display: flex;
+  min-width: 0;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 12px;
@@ -450,8 +522,12 @@ main {
 
 .type-badge {
   padding: 7px 10px;
+  min-width: 0;
+  overflow: hidden;
   background: var(--badge-soft);
   color: var(--badge-color);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .question-count {
@@ -477,7 +553,9 @@ main {
 }
 
 .question-card {
+  min-width: 0;
   padding: 24px 20px;
+  overflow: hidden;
   border: 1px solid var(--line);
   border-radius: 26px;
   background: var(--surface);
@@ -486,9 +564,11 @@ main {
 
 .question-card h2 {
   margin: 0;
+  overflow-wrap: anywhere;
   font-size: 20px;
   line-height: 1.55;
   letter-spacing: -0.04em;
+  word-break: break-word;
 }
 
 .question-card .hint {
@@ -564,6 +644,7 @@ main {
 .text-answer,
 .code-answer {
   width: 100%;
+  max-width: 100%;
   border: 1px solid var(--line);
   border-radius: 16px;
   outline: none;
@@ -581,6 +662,13 @@ main {
   padding: 15px;
   resize: vertical;
   font: 12px/1.65 "SFMono-Regular", Consolas, monospace;
+}
+
+.long-answer {
+  min-height: 132px;
+  padding: 15px;
+  resize: vertical;
+  line-height: 1.65;
 }
 
 .text-answer:focus,

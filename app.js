@@ -516,10 +516,37 @@ const QUESTIONS = [
   }
 ];
 
-const STORAGE_KEY = "codefit-progress-v1";
+const SUBJECTS = {
+  csharp: {
+    label: "C#",
+    mark: "C#",
+    color: "#ff6f4d",
+    questions: QUESTIONS,
+    eyebrow: "C# 핵심 개념 트레이닝",
+    title: "오늘도 한 문제씩,<br><em>실력은 선명하게.</em>",
+    description: "객관식부터 코딩까지 원하는 방식으로 연습하세요.",
+    mix: "객관식 · 주관식 · 빈칸 · 코딩 중 랜덤 10문제"
+  },
+  android: {
+    label: "안드로이드",
+    mark: "A",
+    color: "#3da55d",
+    questions: globalThis.ANDROID_QUESTIONS,
+    eyebrow: "ANDROID 핵심 개념 트레이닝",
+    title: "앱의 동작 원리,<br><em>문제로 익혀보세요.</em>",
+    description: "C# 문제와 분리된 안드로이드 전용 문제 모드입니다.",
+    mix: "객관식 · 주관식 중 랜덤 10문제"
+  }
+};
+
+const STORAGE_PREFIX = "codefit-progress-v2";
+const SUBJECT_KEY = "codefit-active-subject";
 const app = document.querySelector("#app");
 let state = {
   view: "home",
+  subject: ["csharp", "android"].includes(new URLSearchParams(window.location.search).get("subject"))
+    ? new URLSearchParams(window.location.search).get("subject")
+    : localStorage.getItem(SUBJECT_KEY) || "csharp",
   queue: [],
   index: 0,
   answers: [],
@@ -528,16 +555,26 @@ let state = {
   modeLabel: ""
 };
 
+function getSubject() {
+  return SUBJECTS[state.subject] || SUBJECTS.csharp;
+}
+
+function getQuestions() {
+  return getSubject().questions;
+}
+
 function loadProgress() {
   try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || { solved: 0, correct: 0, history: [] };
+    const current = localStorage.getItem(`${STORAGE_PREFIX}-${state.subject}`);
+    const legacy = state.subject === "csharp" ? localStorage.getItem("codefit-progress-v1") : null;
+    return JSON.parse(current || legacy) || { solved: 0, correct: 0, history: [] };
   } catch {
     return { solved: 0, correct: 0, history: [] };
   }
 }
 
 function saveProgress(progress) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+  localStorage.setItem(`${STORAGE_PREFIX}-${state.subject}`, JSON.stringify(progress));
 }
 
 function shuffle(items) {
@@ -555,6 +592,20 @@ function renderHome() {
   state.view = "home";
   const template = document.querySelector("#homeTemplate");
   app.replaceChildren(template.content.cloneNode(true));
+  const subject = getSubject();
+  const questions = getQuestions();
+
+  document.querySelector(".brand-mark").textContent = subject.mark;
+  app.querySelectorAll("[data-action='select-subject']").forEach((button) => {
+    const isActive = button.dataset.subject === state.subject;
+    button.classList.toggle("active", isActive);
+    button.style.setProperty("--subject-color", SUBJECTS[button.dataset.subject].color);
+    button.setAttribute("aria-pressed", String(isActive));
+  });
+  app.querySelector('[data-subject-copy="eyebrow"]').textContent = subject.eyebrow;
+  app.querySelector('[data-subject-copy="title"]').innerHTML = subject.title;
+  app.querySelector('[data-subject-copy="description"]').textContent = subject.description;
+  app.querySelector('[data-subject-copy="mix"]').textContent = subject.mix;
 
   const progress = loadProgress();
   const accuracy = progress.solved ? Math.round((progress.correct / progress.solved) * 100) : 0;
@@ -566,7 +617,8 @@ function renderHome() {
 
   const typeGrid = app.querySelector("#typeGrid");
   Object.entries(TYPES).forEach(([key, type]) => {
-    const count = QUESTIONS.filter((question) => question.type === key).length;
+    const count = questions.filter((question) => question.type === key).length;
+    if (!count) return;
     const card = document.createElement("button");
     card.className = "type-card";
     card.dataset.action = "start-type";
@@ -604,6 +656,7 @@ function renderHome() {
 function startQuiz(queue, label) {
   state = {
     view: "quiz",
+    subject: state.subject,
     queue: shuffle(queue),
     index: 0,
     answers: [],
@@ -660,6 +713,8 @@ function renderAnswerInput(question) {
 
   if (question.type === "coding") {
     answerArea.innerHTML = '<textarea class="code-answer" id="textAnswer" spellcheck="false" placeholder="// 여기에 C# 코드를 작성하세요"></textarea>';
+  } else if (question.keywords || question.keywordsAny) {
+    answerArea.innerHTML = '<textarea class="text-answer long-answer" id="textAnswer" placeholder="핵심 내용을 설명하세요"></textarea>';
   } else {
     answerArea.innerHTML = '<input class="text-answer" id="textAnswer" type="text" autocomplete="off" placeholder="정답을 입력하세요">';
   }
@@ -687,6 +742,13 @@ function grade(question, answer) {
     return question.required.every((keyword) => source.includes(normalize(keyword)));
   }
   const source = normalize(answer);
+  if (question.keywords) {
+    return question.keywords.every((keyword) => source.includes(normalize(keyword)));
+  }
+  if (question.keywordsAny) {
+    const matches = question.keywordsAny.filter((keyword) => source.includes(normalize(keyword))).length;
+    return matches >= (question.keywordMinimum || 1);
+  }
   return question.answers.some((accepted) => source === normalize(accepted));
 }
 
@@ -814,11 +876,16 @@ app.addEventListener("click", (event) => {
   if (!target) return;
 
   if (target.dataset.action === "start-mix") {
-    startQuiz(shuffle(QUESTIONS).slice(0, 10), "랜덤 믹스");
+    startQuiz(shuffle(getQuestions()).slice(0, 10), `${getSubject().label} 랜덤 믹스`);
   }
   if (target.dataset.action === "start-type") {
     const type = target.dataset.type;
-    startQuiz(QUESTIONS.filter((question) => question.type === type), `${TYPES[type].label} 집중 연습`);
+    startQuiz(getQuestions().filter((question) => question.type === type), `${getSubject().label} ${TYPES[type].label} 집중 연습`);
+  }
+  if (target.dataset.action === "select-subject") {
+    state.subject = target.dataset.subject;
+    localStorage.setItem(SUBJECT_KEY, state.subject);
+    renderHome();
   }
   if (target.dataset.action === "quit" || target.dataset.action === "home") {
     renderHome();
@@ -831,8 +898,8 @@ app.addEventListener("click", (event) => {
 
 document.querySelector("#brandButton").addEventListener("click", renderHome);
 document.querySelector("#resetButton").addEventListener("click", () => {
-  if (confirm("누적 학습 기록을 모두 초기화할까요?")) {
-    localStorage.removeItem(STORAGE_KEY);
+  if (confirm(`${getSubject().label} 모드의 누적 학습 기록을 초기화할까요?`)) {
+    localStorage.removeItem(`${STORAGE_PREFIX}-${state.subject}`);
     renderHome();
   }
 });
@@ -888,5 +955,5 @@ renderHome();
 updateInstallButton();
 
 if (new URLSearchParams(window.location.search).get("mode") === "mix") {
-  startQuiz(shuffle(QUESTIONS).slice(0, 10), "랜덤 믹스");
+  startQuiz(shuffle(getQuestions()).slice(0, 10), `${getSubject().label} 랜덤 믹스`);
 }
