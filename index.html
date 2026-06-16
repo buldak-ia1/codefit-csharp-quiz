@@ -8,8 +8,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="코드핏">
-  <meta name="description" content="C#과 안드로이드 시험 문제를 유형별 또는 랜덤으로 연습하는 학습 앱">
-  <title>코드핏 | C# · 안드로이드 문제 풀이</title>
+  <meta name="description" content="C#, 안드로이드, 시스템소프트웨어실습 시험 문제를 유형별 또는 랜덤으로 연습하는 학습 앱">
+  <title>코드핏 | C# · 안드로이드 · 시스템소프트웨어실습 문제 풀이</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icons/app-icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icons/app-icon-192.png">
@@ -47,6 +47,10 @@
       <button class="subject-button" data-action="select-subject" data-subject="android">
         <span class="subject-symbol android">A</span>
         <span><strong>안드로이드 모드</strong><small>객관식 · 주관식</small></span>
+      </button>
+      <button class="subject-button" data-action="select-subject" data-subject="system">
+        <span class="subject-symbol system">SW</span>
+        <span><strong>시스템소프트웨어실습</strong><small>객관식 · 주관식 · 코딩</small></span>
       </button>
     </section>
 
@@ -110,6 +114,8 @@
   </template>
 
   <script src="android-questions.js"></script>
+  <script src="csharp-new-questions.js"></script>
+  <script src="system-software-questions.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

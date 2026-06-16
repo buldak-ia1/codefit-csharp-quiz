@@ -1,10 +1,12 @@
-const CACHE_NAME = "codefit-v3";
+const CACHE_NAME = "codefit-v5";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./styles.css",
   "./app.js",
   "./android-questions.js",
+  "./csharp-new-questions.js",
+  "./system-software-questions.js",
   "./manifest.webmanifest",
   "./icons/app-icon.svg",
   "./icons/app-icon-192.png",

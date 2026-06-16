@@ -222,6 +222,10 @@ main {
   background: #3da55d;
 }
 
+.subject-symbol.system {
+  background: #6f63ff;
+}
+
 .hero {
   display: grid;
   gap: 22px;

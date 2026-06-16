@@ -521,7 +521,7 @@ const SUBJECTS = {
     label: "C#",
     mark: "C#",
     color: "#ff6f4d",
-    questions: QUESTIONS,
+    questions: [...QUESTIONS, ...(globalThis.CSHARP_NEW_QUESTIONS || [])],
     eyebrow: "C# 핵심 개념 트레이닝",
     title: "오늘도 한 문제씩,<br><em>실력은 선명하게.</em>",
     description: "객관식부터 코딩까지 원하는 방식으로 연습하세요.",
@@ -536,6 +536,16 @@ const SUBJECTS = {
     title: "앱의 동작 원리,<br><em>문제로 익혀보세요.</em>",
     description: "C# 문제와 분리된 안드로이드 전용 문제 모드입니다.",
     mix: "객관식 · 주관식 중 랜덤 10문제"
+  },
+  system: {
+    label: "시스템소프트웨어실습",
+    mark: "SW",
+    color: "#6f63ff",
+    questions: globalThis.SYSTEM_SOFTWARE_QUESTIONS || [],
+    eyebrow: "시스템소프트웨어실습 예상문제",
+    title: "패턴부터 테스트까지,<br><em>핵심만 빠르게.</em>",
+    description: "기존 문제와 분리된 시스템소프트웨어실습 전용 문제 모드입니다.",
+    mix: "객관식 · 주관식 · 코딩 중 랜덤 10문제"
   }
 };
 
@@ -544,7 +554,7 @@ const SUBJECT_KEY = "codefit-active-subject";
 const app = document.querySelector("#app");
 let state = {
   view: "home",
-  subject: ["csharp", "android"].includes(new URLSearchParams(window.location.search).get("subject"))
+  subject: ["csharp", "android", "system"].includes(new URLSearchParams(window.location.search).get("subject"))
     ? new URLSearchParams(window.location.search).get("subject")
     : localStorage.getItem(SUBJECT_KEY) || "csharp",
   queue: [],
@@ -712,7 +722,7 @@ function renderAnswerInput(question) {
   }
 
   if (question.type === "coding") {
-    answerArea.innerHTML = '<textarea class="code-answer" id="textAnswer" spellcheck="false" placeholder="// 여기에 C# 코드를 작성하세요"></textarea>';
+    answerArea.innerHTML = '<textarea class="code-answer" id="textAnswer" spellcheck="false" placeholder="// 여기에 코드나 핵심 설명을 작성하세요"></textarea>';
   } else if (question.keywords || question.keywordsAny) {
     answerArea.innerHTML = '<textarea class="text-answer long-answer" id="textAnswer" placeholder="핵심 내용을 설명하세요"></textarea>';
   } else {
