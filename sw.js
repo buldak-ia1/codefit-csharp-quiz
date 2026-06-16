@@ -1,4 +1,4 @@
-const CACHE_NAME = "codefit-v6";
+const CACHE_NAME = "codefit-v7";
 const APP_SHELL = [
   "./",
   "./index.html",
