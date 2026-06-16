@@ -3,6 +3,7 @@ const TYPES = {
     label: "객관식",
     description: "보기에서 정답 고르기",
     icon: "A",
+    kind: "choice",
     color: "#4773e8",
     soft: "#edf2ff"
   },
@@ -10,6 +11,7 @@ const TYPES = {
     label: "주관식",
     description: "핵심 용어 직접 입력",
     icon: "T",
+    kind: "short",
     color: "#2fa978",
     soft: "#eaf8f2"
   },
@@ -17,6 +19,7 @@ const TYPES = {
     label: "빈칸",
     description: "코드의 빈칸 완성하기",
     icon: "_",
+    kind: "blank",
     color: "#8158d8",
     soft: "#f2edfc"
   },
@@ -24,8 +27,41 @@ const TYPES = {
     label: "코딩",
     description: "조건에 맞는 코드 작성",
     icon: "</>",
+    kind: "coding",
     color: "#ff6f4d",
     soft: "#fff0eb"
+  },
+  basic_choice: {
+    label: "기본_객관식",
+    description: "기본 개념 보기 선택",
+    icon: "기본A",
+    kind: "choice",
+    color: "#5d7ce8",
+    soft: "#eef3ff"
+  },
+  basic_short: {
+    label: "기본_주관식",
+    description: "기본 용어 직접 입력",
+    icon: "기본T",
+    kind: "short",
+    color: "#20a38f",
+    soft: "#e8f8f5"
+  },
+  basic_blank: {
+    label: "기본_빈칸",
+    description: "기본 구문 빈칸 채우기",
+    icon: "기본_",
+    kind: "blank",
+    color: "#9a65d8",
+    soft: "#f4edfc"
+  },
+  basic_coding: {
+    label: "기본_코딩",
+    description: "기본 코드와 계산 연습",
+    icon: "기본</>",
+    kind: "coding",
+    color: "#8a63ff",
+    soft: "#f3efff"
   }
 };
 
@@ -545,7 +581,7 @@ const SUBJECTS = {
     eyebrow: "시스템소프트웨어실습 예상문제",
     title: "패턴부터 테스트까지,<br><em>핵심만 빠르게.</em>",
     description: "기존 문제와 분리된 시스템소프트웨어실습 전용 문제 모드입니다.",
-    mix: "객관식 · 주관식 · 코딩 중 랜덤 10문제"
+    mix: "객관식 · 주관식 · 코딩 · 기본_* 중 랜덤 10문제"
   }
 };
 
@@ -571,6 +607,14 @@ function getSubject() {
 
 function getQuestions() {
   return getSubject().questions;
+}
+
+function getTypeMeta(type) {
+  return TYPES[type] || TYPES.short;
+}
+
+function getTypeKind(question) {
+  return getTypeMeta(question.type).kind || question.type;
 }
 
 function loadProgress() {
@@ -636,7 +680,7 @@ function renderHome() {
     card.style.setProperty("--type-color", type.color);
     card.style.setProperty("--type-soft", type.soft);
     card.innerHTML = `
-      <span class="type-icon">${type.icon}</span>
+      <span class="type-icon">${escapeHtml(type.icon)}</span>
       <strong>${type.label}</strong>
       <small>${type.description}</small>
       <small class="type-count">${count}문제</small>
@@ -679,7 +723,7 @@ function startQuiz(queue, label) {
 
 function renderQuestion() {
   const question = state.queue[state.index];
-  const type = TYPES[question.type];
+  const type = getTypeMeta(question.type);
   const percent = Math.round(((state.index + 1) / state.queue.length) * 100);
 
   app.innerHTML = `
@@ -709,7 +753,8 @@ function renderQuestion() {
 
 function renderAnswerInput(question) {
   const answerArea = app.querySelector("#answerArea");
-  if (question.type === "choice") {
+  const kind = getTypeKind(question);
+  if (kind === "choice") {
     question.options.forEach((option, index) => {
       const button = document.createElement("button");
       button.className = "option";
@@ -721,7 +766,7 @@ function renderAnswerInput(question) {
     return;
   }
 
-  if (question.type === "coding") {
+  if (kind === "coding") {
     answerArea.innerHTML = '<textarea class="code-answer" id="textAnswer" spellcheck="false" placeholder="// 여기에 코드나 핵심 설명을 작성하세요"></textarea>';
   } else if (question.keywords || question.keywordsAny) {
     answerArea.innerHTML = '<textarea class="text-answer long-answer" id="textAnswer" placeholder="핵심 내용을 설명하세요"></textarea>';
@@ -746,8 +791,9 @@ function selectOption(index) {
 }
 
 function grade(question, answer) {
-  if (question.type === "choice") return answer === question.answer;
-  if (question.type === "coding") {
+  const kind = getTypeKind(question);
+  if (kind === "choice") return answer === question.answer;
+  if (kind === "coding") {
     const source = normalize(answer);
     return question.required.every((keyword) => source.includes(normalize(keyword)));
   }
@@ -777,7 +823,7 @@ function handleSubmit() {
   const submitButton = app.querySelector("#submitButton");
   submitButton.textContent = state.index === state.queue.length - 1 ? "결과 보기" : "다음 문제";
 
-  if (question.type === "choice") {
+  if (getTypeKind(question) === "choice") {
     app.querySelectorAll(".option").forEach((option, index) => {
       option.disabled = true;
       if (index === question.answer) option.classList.add("correct");
@@ -789,17 +835,18 @@ function handleSubmit() {
 }
 
 function showFeedback(question, correct) {
+  const kind = getTypeKind(question);
   const displayAnswer =
-    question.type === "choice" ? question.options[question.answer] :
-    question.type === "coding" ? question.sample :
+    kind === "choice" ? question.options[question.answer] :
+    kind === "coding" ? question.sample :
     question.displayAnswer;
   const feedbackArea = app.querySelector("#feedbackArea");
   feedbackArea.innerHTML = `
     <div class="feedback" style="--feedback-bg:${correct ? "#eaf8f2" : "#fff1f1"};--feedback-color:${correct ? "#23845e" : "#c44949"}">
       <strong>${correct ? "정답입니다." : "조금 아쉬워요."}</strong>
       <p>${question.explanation}</p>
-      <p class="answer-note">정답 ${question.type === "coding" ? "예시" : ""}: ${question.type === "coding" ? "" : displayAnswer}</p>
-      ${question.type === "coding" ? `<pre class="code-block">${escapeHtml(displayAnswer)}</pre>` : ""}
+      <p class="answer-note">정답 ${kind === "coding" ? "예시" : ""}: ${kind === "coding" ? "" : displayAnswer}</p>
+      ${kind === "coding" ? `<pre class="code-block">${escapeHtml(displayAnswer)}</pre>` : ""}
     </div>
   `;
 }

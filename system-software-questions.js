@@ -30,6 +30,49 @@ const makeSystemCoding = ([topic, prompt, hint, required, sample, explanation], 
   explanation
 });
 
+const makeSystemBasicChoice = ([topic, prompt, options, answer, explanation], index) => ({
+  id: `basic_choice_${String(index + 1).padStart(2, "0")}`,
+  type: "basic_choice",
+  topic,
+  prompt,
+  options,
+  answer,
+  explanation
+});
+
+const makeSystemBasicShort = ([topic, prompt, displayAnswer, keywordsAny, keywordMinimum = 1], index) => ({
+  id: `basic_short_${String(index + 1).padStart(2, "0")}`,
+  type: "basic_short",
+  topic,
+  prompt,
+  keywordsAny,
+  keywordMinimum,
+  displayAnswer,
+  explanation: displayAnswer
+});
+
+const makeSystemBasicBlank = ([topic, prompt, code, answers, displayAnswer, explanation], index) => ({
+  id: `basic_blank_${String(index + 1).padStart(2, "0")}`,
+  type: "basic_blank",
+  topic,
+  prompt,
+  code,
+  answers,
+  displayAnswer,
+  explanation
+});
+
+const makeSystemBasicCoding = ([topic, prompt, hint, required, sample, explanation], index) => ({
+  id: `basic_coding_${String(index + 1).padStart(2, "0")}`,
+  type: "basic_coding",
+  topic,
+  prompt,
+  hint,
+  required,
+  sample: sample.trim(),
+  explanation
+});
+
 globalThis.SYSTEM_SOFTWARE_QUESTIONS = [
   ...[
     ["디자인 패턴", "GoF 디자인 패턴이 필요한 이유를 쓰세요.", "설계 지식 재사용, 반복되는 문제 해결, 객체지향 설계 노하우 공유, 유지보수성 향상", ["설계 지식 재사용", "반복되는 문제", "객체지향", "유지보수성"]],
@@ -155,5 +198,95 @@ CC = 3 + 1
 CC = 4`,
       "11 - 9 + 2 = 4이고, P + 1도 3 + 1 = 4입니다."
     ]
-  ].map(makeSystemCoding)
+  ].map(makeSystemCoding),
+
+  ...[
+    ["디자인 패턴", "GoF 디자인 패턴은 무엇을 정리한 것인가?", ["데이터 저장 방식", "반복되는 설계 문제의 해결 방법", "운영체제 명령어", "컴파일러 문법"], 1, "GoF 디자인 패턴은 반복되는 설계 문제의 해결 방법을 정리한 것입니다."],
+    ["Strategy", "Strategy 패턴의 핵심 초점은?", ["상태 변화", "기능이나 알고리즘 교체", "파일 입출력", "테스트 자동화"], 1, "Strategy 패턴은 기능이나 알고리즘을 교체하기 쉽게 만드는 데 초점이 있습니다."],
+    ["State", "State 패턴의 핵심 초점은?", ["객체의 상태 변화", "객체 생성 과정", "테이블 정규화", "네트워크 주소 변환"], 0, "State 패턴은 객체의 상태 변화와 상태별 행동을 다룹니다."],
+    ["Adapter", "Adapter 패턴을 사용하는 대표 이유는?", ["호환되지 않는 인터페이스 연결", "메모리 직접 해제", "테스트 데이터 생성", "프로젝트 일정 산정"], 0, "Adapter는 호환되지 않는 인터페이스를 연결합니다."],
+    ["Factory Method", "Factory Method 패턴은 무엇을 별도 메서드나 클래스에 맡기는가?", ["객체 생성", "코드 실행", "형상 감사", "스트레스 테스트"], 0, "Factory Method는 객체 생성을 직접 하지 않고 별도 메서드나 클래스에 맡깁니다."],
+    ["구현", "표준 코딩 규칙의 가장 직접적인 효과는?", ["가독성과 유지보수성 향상", "CPU 교체", "네트워크 속도 증가", "DB 자동 백업"], 0, "표준 코딩 규칙은 가독성과 유지보수성을 높입니다."],
+    ["테스트", "프로그램을 실행하지 않고 문서나 코드를 검토하는 테스트는?", ["동적 테스트", "정적 테스트", "스트레스 테스트", "인수 테스트"], 1, "정적 테스트는 실행하지 않고 문서나 코드를 검토합니다."],
+    ["테스트", "내부 구조를 보지 않고 입력과 예상 출력을 비교하는 테스트는?", ["화이트박스 테스트", "블랙박스 테스트", "기본 경로 테스트", "분기 검증"], 1, "블랙박스 테스트는 내부 구조를 보지 않고 명세와 입출력을 기준으로 테스트합니다."],
+    ["품질", "ISO/IEC 9126 품질 특성에 해당하는 것은?", ["위험성", "기능성", "무작위성", "복잡성"], 1, "기능성은 ISO/IEC 9126의 품질 특성입니다."],
+    ["프로젝트 관리", "변경 요청을 검토하고 승인 또는 거절하는 조직은?", ["CCB", "JVM", "SQL", "GUI"], 0, "CCB는 변경 요청을 검토하고 승인 또는 거절합니다."]
+  ].map(makeSystemBasicChoice),
+
+  ...[
+    ["디자인 패턴", "GoF 디자인 패턴의 핵심 목적을 한 문장으로 쓰세요.", "반복되는 설계 문제를 재사용 가능한 해결 방법으로 정리하는 것입니다.", ["반복되는 설계 문제", "재사용", "해결 방법"]],
+    ["Strategy", "Strategy 패턴은 무엇이 자주 바뀔 때 사용하는지 쓰세요.", "기능, 메서드, 알고리즘이 자주 바뀔 때 사용합니다.", ["기능", "메서드", "알고리즘"], 1],
+    ["State", "State 패턴은 무엇이 자주 추가되거나 변경될 때 사용하는지 쓰세요.", "객체의 상태가 자주 추가되거나 변경될 때 사용합니다.", ["상태", "추가", "변경"]],
+    ["Adapter", "Adapter 패턴의 핵심 목적을 쓰세요.", "호환되지 않는 인터페이스를 연결하는 것입니다.", ["호환되지 않는 인터페이스", "연결"]],
+    ["Factory Method", "Factory Method 패턴이 객체 생성을 직접 하지 않는 이유를 쓰세요.", "결합도를 낮추고 확장성을 높이기 위해서입니다.", ["결합도", "확장성"]],
+    ["구현", "매크로명과 상수명은 보통 어떤 형태로 작성하는지 쓰세요.", "대문자를 사용하고 필요하면 언더바를 사용합니다.", ["대문자", "언더바"]],
+    ["테스트", "오류, 결함, 고장 중 개발자의 실수를 뜻하는 용어를 쓰세요.", "오류는 개발자의 실수를 뜻합니다.", ["오류"]],
+    ["테스트", "동등 분할 기법의 핵심을 쓰세요.", "입력 영역을 같은 성격의 그룹으로 나누고 대표값으로 테스트합니다.", ["입력 영역", "그룹", "대표값"], 2],
+    ["품질", "ISO/IEC 9126의 품질 특성 중 믿고 안정적으로 사용할 수 있는지를 보는 특성을 쓰세요.", "신뢰성입니다.", ["신뢰성"]],
+    ["프로젝트 관리", "형상관리에서 특정 시점의 산출물 기준 버전 묶음을 무엇이라고 하는지 쓰세요.", "베이스라인입니다.", ["베이스라인"]]
+  ].map(makeSystemBasicShort),
+
+  ...[
+    ["Strategy", "Strategy 패턴의 공격 동작 메서드명을 채우세요.", "public interface Attack {\n    public void _____();\n}", ["motion", "motion()"], "motion", "Attack 인터페이스의 공격 동작 메서드는 motion()입니다."],
+    ["State", "Wind 상태로 변경하는 메서드명을 채우세요.", "EF._____(new Wind());", ["setstate", "setstate()"], "setState", "State 패턴 예제에서는 setState(new Wind())로 상태를 변경합니다."],
+    ["구현", "표준 코딩 규칙에 맞는 매크로명을 채우세요.", "#define _____ 10", ["size"], "SIZE", "매크로명은 대문자를 사용합니다."],
+    ["테스트", "순환 복잡도 공식의 빈칸을 채우세요.", "CC = E - N + _____", ["2"], "2", "순환 복잡도 공식은 CC = E - N + 2입니다."],
+    ["프로젝트 관리", "변경 통제 위원회의 약어를 채우세요.", "형상관리 변경 요청은 _____가 검토한다.", ["ccb"], "CCB", "CCB는 변경 요청을 검토하고 승인 또는 거절합니다."]
+  ].map(makeSystemBasicBlank),
+
+  ...[
+    [
+      "Strategy",
+      "Attack 인터페이스와 Flame 클래스에 motion()을 넣어 기본 Strategy 코드를 작성하세요.",
+      "interface와 class 양쪽에 motion()이 들어가야 합니다.",
+      ["interface Attack", "void motion()", "class Flame", "System.out.println"],
+      `public interface Attack {
+    void motion();
+}
+
+public class Flame implements Attack {
+    public void motion() {
+        System.out.println("불꽃 공격");
+    }
+}`,
+      "전략 인터페이스와 구현 클래스가 같은 motion() 시그니처를 가져야 합니다."
+    ],
+    [
+      "State",
+      "Stop 상태에서 ON 버튼을 눌렀을 때 Wind 상태로 바꾸는 기본 코드를 작성하세요.",
+      "setState(new Wind())를 사용하세요.",
+      ["on_button", "setState(new Wind())"],
+      `public void on_button(ElectricFan EF) {
+    EF.setState(new Wind());
+}`,
+      "정지 상태의 ON 동작은 Wind 상태로 전환합니다."
+    ],
+    [
+      "구현",
+      "#define size 10을 표준 코딩 규칙에 맞게 고치세요.",
+      "매크로명은 대문자로 작성합니다.",
+      ["#define SIZE 10"],
+      `#define SIZE 10`,
+      "매크로명은 대문자로 작성합니다."
+    ],
+    [
+      "테스트",
+      "E = 11, N = 9일 때 CC = E - N + 2로 순환 복잡도를 계산하세요.",
+      "계산 과정과 결과 4를 포함하세요.",
+      ["11 - 9 + 2", "4"],
+      `CC = E - N + 2
+CC = 11 - 9 + 2
+CC = 4`,
+      "11 - 9 + 2는 4입니다."
+    ],
+    [
+      "테스트",
+      "정적 테스트와 동적 테스트의 차이를 짧게 코드 주석처럼 정리하세요.",
+      "실행 여부 차이가 드러나야 합니다.",
+      ["정적 테스트", "실행하지 않고", "동적 테스트", "실행"],
+      `// 정적 테스트: 실행하지 않고 문서나 코드를 검토한다.
+// 동적 테스트: 프로그램을 실행하면서 오류를 찾는다.`,
+      "정적 테스트와 동적 테스트는 프로그램 실행 여부가 핵심 차이입니다."
+    ]
+  ].map(makeSystemBasicCoding)
 ];
