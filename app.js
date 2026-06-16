@@ -62,6 +62,15 @@ const TYPES = {
     kind: "coding",
     color: "#8a63ff",
     soft: "#f3efff"
+  },
+  confirm_choice: {
+    label: "확인_객관식",
+    description: "확인 문제 35개 랜덤",
+    icon: "확인A",
+    kind: "choice",
+    sessionSize: 35,
+    color: "#db6d2f",
+    soft: "#fff0e7"
   }
 };
 
@@ -577,11 +586,14 @@ const SUBJECTS = {
     label: "시스템소프트웨어실습",
     mark: "SW",
     color: "#6f63ff",
-    questions: globalThis.SYSTEM_SOFTWARE_QUESTIONS || [],
+    questions: [
+      ...(globalThis.SYSTEM_SOFTWARE_QUESTIONS || []),
+      ...(globalThis.SYSTEM_SOFTWARE_CONFIRM_QUESTIONS || [])
+    ],
     eyebrow: "시스템소프트웨어실습 예상문제",
     title: "패턴부터 테스트까지,<br><em>핵심만 빠르게.</em>",
     description: "기존 문제와 분리된 시스템소프트웨어실습 전용 문제 모드입니다.",
-    mix: "객관식 · 주관식 · 코딩 · 기본_* 중 랜덤 10문제"
+    mix: "객관식 · 주관식 · 코딩 · 기본_* · 확인_* 중 랜덤 10문제"
   }
 };
 
@@ -679,11 +691,14 @@ function renderHome() {
     card.dataset.type = key;
     card.style.setProperty("--type-color", type.color);
     card.style.setProperty("--type-soft", type.soft);
+    const countLabel = type.sessionSize && count > type.sessionSize
+      ? `${count}문제 중 ${type.sessionSize}문제 랜덤`
+      : `${count}문제`;
     card.innerHTML = `
       <span class="type-icon">${escapeHtml(type.icon)}</span>
       <strong>${type.label}</strong>
       <small>${type.description}</small>
-      <small class="type-count">${count}문제</small>
+      <small class="type-count">${countLabel}</small>
     `;
     typeGrid.append(card);
   });
@@ -719,6 +734,16 @@ function startQuiz(queue, label) {
     modeLabel: label
   };
   renderQuestion();
+}
+
+function startTypeQuiz(type) {
+  const meta = getTypeMeta(type);
+  const pool = getQuestions().filter((question) => question.type === type);
+  const queue = meta.sessionSize && pool.length > meta.sessionSize
+    ? shuffle(pool).slice(0, meta.sessionSize)
+    : pool;
+  const suffix = meta.sessionSize && pool.length > meta.sessionSize ? ` ${meta.sessionSize}문제 랜덤` : " 집중 연습";
+  startQuiz(queue, `${getSubject().label} ${meta.label}${suffix}`);
 }
 
 function renderQuestion() {
@@ -937,7 +962,7 @@ app.addEventListener("click", (event) => {
   }
   if (target.dataset.action === "start-type") {
     const type = target.dataset.type;
-    startQuiz(getQuestions().filter((question) => question.type === type), `${getSubject().label} ${TYPES[type].label} 집중 연습`);
+    startTypeQuiz(type);
   }
   if (target.dataset.action === "select-subject") {
     state.subject = target.dataset.subject;
