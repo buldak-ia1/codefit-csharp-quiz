@@ -1,4 +1,4 @@
-const CACHE_NAME = "codefit-v8";
+const CACHE_NAME = "codefit-v9";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -8,6 +8,7 @@ const APP_SHELL = [
   "./csharp-new-questions.js",
   "./system-software-questions.js",
   "./system-software-confirm-questions.js",
+  "./capstone-confirm-questions.js",
   "./manifest.webmanifest",
   "./icons/app-icon.svg",
   "./icons/app-icon-192.png",

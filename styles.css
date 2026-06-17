@@ -226,6 +226,10 @@ main {
   background: #6f63ff;
 }
 
+.subject-symbol.capstone {
+  background: #2e9ccf;
+}
+
 .hero {
   display: grid;
   gap: 22px;

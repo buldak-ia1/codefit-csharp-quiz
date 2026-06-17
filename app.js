@@ -71,6 +71,15 @@ const TYPES = {
     sessionSize: 35,
     color: "#db6d2f",
     soft: "#fff0e7"
+  },
+  capstone_confirm_choice: {
+    label: "확인_객관식",
+    description: "확인 문제 30개 랜덤",
+    icon: "확인A",
+    kind: "choice",
+    sessionSize: 30,
+    color: "#2e9ccf",
+    soft: "#eaf7fd"
   }
 };
 
@@ -594,6 +603,16 @@ const SUBJECTS = {
     title: "패턴부터 테스트까지,<br><em>핵심만 빠르게.</em>",
     description: "기존 문제와 분리된 시스템소프트웨어실습 전용 문제 모드입니다.",
     mix: "객관식 · 주관식 · 코딩 · 기본_* · 확인_* 중 랜덤 10문제"
+  },
+  capstone: {
+    label: "캡스톤디자인",
+    mark: "CD",
+    color: "#2e9ccf",
+    questions: globalThis.CAPSTONE_CONFIRM_QUESTIONS || [],
+    eyebrow: "캡스톤디자인 개념 확인",
+    title: "계약부터 발표까지,<br><em>흐름을 잡아보세요.</em>",
+    description: "캡스톤디자인 전용 확인 문제 모드입니다.",
+    mix: "확인_객관식 중 랜덤 10문제"
   }
 };
 
@@ -602,7 +621,7 @@ const SUBJECT_KEY = "codefit-active-subject";
 const app = document.querySelector("#app");
 let state = {
   view: "home",
-  subject: ["csharp", "android", "system"].includes(new URLSearchParams(window.location.search).get("subject"))
+  subject: ["csharp", "android", "system", "capstone"].includes(new URLSearchParams(window.location.search).get("subject"))
     ? new URLSearchParams(window.location.search).get("subject")
     : localStorage.getItem(SUBJECT_KEY) || "csharp",
   queue: [],
