@@ -80,6 +80,30 @@ const TYPES = {
     sessionSize: 30,
     color: "#2e9ccf",
     soft: "#eaf7fd"
+  },
+  capstone_practice_choice: {
+    label: "실전_객관식",
+    description: "실전 보기 선택",
+    icon: "실전A",
+    kind: "choice",
+    color: "#1e7cc4",
+    soft: "#e9f4fc"
+  },
+  capstone_practice_short: {
+    label: "실전_단답형",
+    description: "실전 핵심 답안 입력",
+    icon: "실전T",
+    kind: "short",
+    color: "#2fa978",
+    soft: "#eaf8f2"
+  },
+  capstone_practice_essay: {
+    label: "실전_서술형",
+    description: "실전 사례 답안 작성",
+    icon: "실전S",
+    kind: "short",
+    color: "#8158d8",
+    soft: "#f2edfc"
   }
 };
 
@@ -608,11 +632,14 @@ const SUBJECTS = {
     label: "캡스톤디자인",
     mark: "CD",
     color: "#2e9ccf",
-    questions: globalThis.CAPSTONE_CONFIRM_QUESTIONS || [],
+    questions: [
+      ...(globalThis.CAPSTONE_CONFIRM_QUESTIONS || []),
+      ...(globalThis.CAPSTONE_PRACTICE_QUESTIONS || [])
+    ],
     eyebrow: "캡스톤디자인 개념 확인",
     title: "계약부터 발표까지,<br><em>흐름을 잡아보세요.</em>",
-    description: "캡스톤디자인 전용 확인 문제 모드입니다.",
-    mix: "확인_객관식 중 랜덤 10문제"
+    description: "캡스톤디자인 전용 확인·실전 문제 모드입니다.",
+    mix: "확인_객관식 · 실전_* 중 랜덤 10문제"
   }
 };
 
